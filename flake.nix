@@ -58,7 +58,7 @@
         ./modules/configuration.nix
         ./modules/cli.nix
         ./modules/vm-test.nix
-        ./modules/nginx/ekiptakip.nix
+        ./modules/nginx/hello.nix
       ];
     };
   };

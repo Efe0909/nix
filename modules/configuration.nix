@@ -151,8 +151,8 @@
       locations."/".return = "404";
     };
 
-    # EkipTakip vhost'lari nginx-ekiptakip.nix'te — SU AN YALNIZCA vmtest'e
-    # import ediliyor (bkz. flake.nix). Gercek Pi'ye tasima ayri bir is.
+    # Yeni bir proje icin vhost eklerken sablon: modules/nginx/hello.nix
+    # (su an sadece vmtest'e import ediliyor, bkz. flake.nix).
   };
 
   # =========================================================== CLOUDFLARED ===
