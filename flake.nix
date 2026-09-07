@@ -27,9 +27,9 @@
       modules = [
         raspberry-pi-nix.nixosModules.raspberry-pi
         agenix.nixosModules.default
-        ./hardware-rpi.nix
-        ./configuration.nix
-        ./cli.nix
+        ./modules/rpi/hardware-rpi.nix
+        ./modules/configuration.nix
+        ./modules/cli.nix
       ];
     };
 
@@ -55,10 +55,10 @@
       system = "aarch64-linux";
       modules = [
         agenix.nixosModules.default
-        ./configuration.nix
-        ./cli.nix
-        ./vm-test.nix
-        ./nginx-ekiptakip.nix
+        ./modules/configuration.nix
+        ./modules/cli.nix
+        ./modules/vm-test.nix
+        ./modules/nginx/ekiptakip.nix
       ];
     };
   };

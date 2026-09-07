@@ -218,6 +218,11 @@ in {
     alias diff='diff --color=auto'
     alias ip='ip -c'
 
+    # nix run ile commit etmeden dene — package systemPackages'e girmez,
+    # sadece bu alias git'te tutulur (bkz. sohbet: 'commit etmeden nix store').
+    alias y='nix run nixpkgs#yazi'
+    alias neofetch='nix run nixpkgs#fastfetch'
+
     # --- fzf: Ctrl-R gecmis, Ctrl-T dosya, Alt-C dizin ---
     source ${pkgs.fzf}/share/fzf/key-bindings.bash
     source ${pkgs.fzf}/share/fzf/completion.bash
