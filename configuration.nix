@@ -151,11 +151,8 @@
       locations."/".return = "404";
     };
 
-    # EkipTakip geldiginde (ayri bir is):
-    # virtualHosts."dashboard.polonyum.com".locations."/".proxyPass =
-    #   "http://127.0.0.1:8000";
-    # virtualHosts."app.polonyum.com".locations."/".proxyPass =
-    #   "http://127.0.0.1:8000";
+    # EkipTakip vhost'lari nginx-ekiptakip.nix'te — SU AN YALNIZCA vmtest'e
+    # import ediliyor (bkz. flake.nix). Gercek Pi'ye tasima ayri bir is.
   };
 
   # =========================================================== CLOUDFLARED ===

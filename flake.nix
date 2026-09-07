@@ -58,6 +58,7 @@
         ./configuration.nix
         ./cli.nix
         ./vm-test.nix
+        ./nginx-ekiptakip.nix
       ];
     };
   };
