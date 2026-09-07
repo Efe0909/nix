@@ -58,10 +58,7 @@
         ./modules/configuration.nix
         ./modules/cli.nix
         ./modules/vm-test.nix
-        # ekiptakip.nix BILEREK cikarildi — gercek EkipTakip deploy'u
-        # ayri bir is (bkz. modules/nginx/ekiptakip.nix, dosya duruyor).
-        # Yerine ornek/sablon modul: yeni bir proje eklerken bu deseni kopyala.
-        ./modules/hello/default.nix
+        ./modules/nginx/ekiptakip.nix
       ];
     };
   };
