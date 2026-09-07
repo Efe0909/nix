@@ -132,11 +132,9 @@
   # agenix: secrets repoda ENCRYPTED durur, boot'ta /run/agenix altina cozulur.
   # secrets.nix icinde hangi anahtarin hangi secret'i acabilecegi yazar.
   age.secrets = {
-    # Dummy — agenix akisini denemek icin. Kalici Pi'de tutulmayacak,
-    # su an sadece "sistem gercekten calisir mi" sorusunun cevabi.
-    dummy = { file = ../secrets/dummy.age; owner = "efe"; };
-
-    # Yollar ../secrets/... — bu dosya modules/ altinda, secrets/ kokte.
+    # Yollar ../secrets/... olacak — bu dosya modules/ altinda, secrets/ kokte.
+    # Su an secrets/ dizini yok (denenip kaldirildi — ssh-to-age uyumsuzlugu
+    # nedeniyle native age-keygen ile yeniden kurulacak, ayri bir is).
     # cloudflared-token.file = ../secrets/cloudflared-token.age;
     # wifi-psk.file          = ../secrets/wifi-psk.age;
     # smtp-sifre = { file = ../secrets/smtp.age; owner = "efe"; };
