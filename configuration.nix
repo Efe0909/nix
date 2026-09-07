@@ -311,7 +311,7 @@
   # ======================================================== OTOMATIK BAKIM ===
   system.autoUpgrade = {
     enable = true;
-    flake = "github:EfeAtcali/evsunucu";       # kendi repo adresinle degistir
+    flake = "github:Efe0909/nix";
     dates = "04:00";
     allowReboot = false;                       # kendi basina yeniden baslatma
   };
