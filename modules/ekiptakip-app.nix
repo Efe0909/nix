@@ -64,6 +64,13 @@ in
 
     path = [ pkgs.docker ];
 
+    # `--env-file` YALNIZCA compose dosyasindaki ${...} yerine koymalari
+    # besler; servisin `env_file:` alani ondan haberdar degil ve
+    # ${EKIPTAKIP_ENV_FILE:-.env} varsayilana duser. Belirtisi:
+    #   env file /nix/store/...-source/.env not found
+    # Yani ikisi de gerekiyor ve AYNI dosyayi gostermeli.
+    environment.EKIPTAKIP_ENV_FILE = sir;
+
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
