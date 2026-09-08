@@ -1,9 +1,19 @@
 { config, ... }:
 
-# YALNIZCA evsunucu (gercek Pi) hedefi bunu import eder — bkz. flake.nix.
-# vmtest'e bilerek eklenmedi: tunel gercek Cloudflare hesabina kayitli bir
-# kimlik yaratiyor, atilip yeniden kurulan test VM'inden yaratmak anlamsiz.
+# evsunucu VE vmtest ikisi de import eder — bkz. flake.nix. Baslangicta
+# vmtest'e bilerek eklenmemisti ("atilip yeniden kurulan test VM'i icin
+# tunel anlamsiz"), ama gercek deploy testi icin kalici baglanti istendi,
+# sonradan eklendi. Tunelin kendisi (evsunucu adiyla) tek, ikisi de ayni
+# credentials'i kullaniyor.
 #
+# Cloudflare Tunnel ayni kimligi birden fazla makineden ayni anda
+# calistirmayi destekliyor (HA/yedeklilik icin resmi ozellik) — yani VM
+# ve gercek Pi ayni anda ayakta kalsa muhtemelen ikisi de baglanir,
+# reddetme YOK. Ama pratik sorun ayri: ikisi ayni tunel kimligini
+# paylastigi icin hangi trafigin nereden geldigi ayirt edilemez — test
+# VM'i ile gercek Pi'yi ayni anda calistirmak debug'i karistirir. Gercek
+# Pi kurulunca VM'deki bu servisi kapatmak (ya da vmtest'ten cikarmak)
+# daha temiz.
 # YEREL yonetimli tunel — UZAKTAN (token) DEGIL. Ingress kurallari
 # Cloudflare panelinde tiklanmiyor, burada, git'te. Yeni hostname eklemek
 # = tek satir + commit, panelde hicbir sey degismiyor.
