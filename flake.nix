@@ -61,6 +61,7 @@
         ./modules/vm-test.nix
         ./modules/nginx/hello.nix
         ./modules/nginx/ekiptakip.nix
+        ./modules/ekiptakip-app.nix
         ./modules/cloudflared.nix
       ];
     };

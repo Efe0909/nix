@@ -7,4 +7,7 @@ let
 in
 {
   "cloudflared-creds.age".publicKeys = [ admin vmtest ];
+  # EkipTakip .env: GOOGLE_CLIENT_ID/SECRET, EKIPTAKIP_SECRET_KEY,
+  # POSTGRES_PASSWORD, alan adlari. modules/ekiptakip-app.nix okuyor.
+  "ekiptakip-env.age".publicKeys = [ admin vmtest ];
 }
