@@ -188,6 +188,9 @@ in {
     pciutils usbutils file
     # --- shell yardimcilari ---
     fzf bash-completion git tmux
+    cloudflared   # tunnel login/create icin CLI; servisin kendisi
+                  # (services.cloudflared) sadece evsunucu'da, bkz.
+                  # modules/cloudflared.nix
   ]);
 
   environment.variables.EDITOR = "vim";
