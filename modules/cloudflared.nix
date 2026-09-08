@@ -48,13 +48,15 @@
 
   services.cloudflared = {
     enable = true;
-    tunnels."<TUNEL-UUID>" = {
+    tunnels."45170328-7abe-4869-b12d-2d85cff85c30" = {
       credentialsFile = config.age.secrets.cloudflared-creds.path;
       default = "http_status:404";
       ingress = {
-        # Yeni hostname eklemek: tek satir + commit, panelde hicbir sey yok.
-        # "app.polonyum.com" = "http://127.0.0.1:80";
-        # "dashboard.polonyum.com" = "http://127.0.0.1:80";
+        # Ikisi de AYNI nginx'e (127.0.0.1:80) gidiyor — ayrim Host
+        # basligina gore nginx/uygulamanin icinde yapiliyor, cloudflared
+        # sadece tasiyici. Yeni hostname eklemek: tek satir + commit.
+        "app.polonyum.com" = "http://127.0.0.1:80";
+        "dashboard.polonyum.com" = "http://127.0.0.1:80";
       };
     };
   };
