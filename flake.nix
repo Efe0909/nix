@@ -60,6 +60,7 @@
         ./modules/cli.nix
         ./modules/vm-test.nix
         ./modules/nginx/hello.nix
+        ./modules/nginx/ekiptakip.nix
       ];
     };
   };
