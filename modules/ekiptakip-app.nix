@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }:
+{ config, pkgs, inputs, ... }:
 
 # EkipTakip uygulamasi — Docker konteyner yigini (uygulama + PostgreSQL).
 # nginx yonlendirmesi ayri dosyada: modules/nginx/ekiptakip.nix
@@ -9,17 +9,20 @@
 #                                                             |
 #                                                        ekiptakip-db
 #
+# Kaynak agaci ELLE KLONLANMIYOR: flake input (bkz. flake.nix "teamtracker",
+# flake = false). Boylece surum flake.lock'ta pinli ve commit'li — VM
+# sifirdan kurulsa ayni surum gelir, guncelleme icin VM'de shell acilmaz:
+#   nix flake update teamtracker && nixos-rebuild switch --flake .#vmtest
+#
 # Neden oci-containers degil de compose: konteyner tanimi zaten uygulamanin
 # deposunda (docker-compose.prod.yml). Nix'e ikinci kez yazmak iki kaynak
 # demek, biri sessizce eskir.
-#
-# ILK KURULUM (bir kere, elle):
-#   sudo mkdir -p /srv && sudo git clone https://github.com/Efe0909/teamtracker /srv/ekiptakip
-# Guncelleme:
-#   sudo git -C /srv/ekiptakip pull && sudo systemctl restart ekiptakip
 
 let
-  depo = "/srv/ekiptakip";
+  # Salt-okunur store yolu. Docker build context olarak da bu kullaniliyor;
+  # build yalnizca okudugu icin sorun degil.
+  kaynak = inputs.teamtracker;
+
   sir = config.age.secrets."ekiptakip-env".path;
 
   # --env-file ve EKIPTAKIP_ENV_FILE AYNI dosyayi gostermeli, ikisi AYRI is
@@ -30,13 +33,16 @@ let
   # Yalnizca birini verirsen belirti sinsi olur: ya parola bos kalir ya
   # uygulama sirsiz acilmaya calisir. (Denendi: env_file: tek basina
   # interpolation'i BESLEMIYOR, sadece uyari verip bos birakiyor.)
-  compose = "${pkgs.docker}/bin/docker compose --env-file ${sir} -f ${depo}/docker-compose.prod.yml";
+  compose = "${pkgs.docker}/bin/docker compose "
+          + "--env-file ${sir} "
+          + "--project-name ekiptakip "        # proje adi store yolundan turemesin
+          + "-f ${kaynak}/docker-compose.prod.yml";
 in
 {
   # --- sir ----------------------------------------------------------------
   # Icerigi: GOOGLE_CLIENT_ID/SECRET, EKIPTAKIP_SECRET_KEY,
   # POSTGRES_PASSWORD, alan adlari, APP_PORT=8000.
-  # secrets/secrets.nix'te alicilari tanimli olmali (admin + vmtest).
+  # secrets/secrets.nix'te alicilari tanimli (admin + vmtest).
   age.secrets."ekiptakip-env" = {
     file = ../secrets/ekiptakip-env.age;
     # Compose'u root calistiriyor.
@@ -48,32 +54,26 @@ in
   # --- servis -------------------------------------------------------------
   systemd.services.ekiptakip = {
     description = "EkipTakip (docker compose yigini)";
-    after = [ "docker.service" "network-online.target" "run-agenix.d.mount" ];
+    after = [ "docker.service" "network-online.target" ];
     requires = [ "docker.service" ];
     wants = [ "network-online.target" ];
     wantedBy = [ "multi-user.target" ];
 
-    path = [ pkgs.docker pkgs.git ];
+    # Store yolu her surumde degisir; birim de o zaman yeniden baslar.
+    restartTriggers = [ kaynak ];
+
+    path = [ pkgs.docker ];
 
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
-      WorkingDirectory = depo;
       # Ilk calistirmada imaj kurulur (pip install dahil), uzun surebilir.
       TimeoutStartSec = "900";
     };
 
-    # --build: depo guncellendiginde yeni imaj kurulsun.
+    # --build: kaynak degisince yeni imaj kurulsun. Docker icerige gore
+    # onbellekliyor, degismediyse anlik geciyor.
     script = "${compose} up -d --build";
     preStop = "${compose} down";
   };
-
-  # Depo yoksa servis anlasilmaz bir docker hatasiyla duser; onceden soyle.
-  systemd.services.ekiptakip.preStart = ''
-    if [ ! -f ${depo}/docker-compose.prod.yml ]; then
-      echo "EkipTakip deposu yok: ${depo}"
-      echo "  sudo git clone https://github.com/Efe0909/teamtracker ${depo}"
-      exit 1
-    fi
-  '';
 }

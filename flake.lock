@@ -163,7 +163,8 @@
       "inputs": {
         "agenix": "agenix",
         "nixpkgs": "nixpkgs",
-        "raspberry-pi-nix": "raspberry-pi-nix"
+        "raspberry-pi-nix": "raspberry-pi-nix",
+        "teamtracker": "teamtracker"
       }
     },
     "rpi-bluez-firmware-src": {
@@ -297,6 +298,22 @@
       "original": {
         "owner": "nix-systems",
         "repo": "default",
+        "type": "github"
+      }
+    },
+    "teamtracker": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1788901188,
+        "narHash": "sha256-SS67jyZE9HqtMgkXcDuKVwtLIQctf1FOMnvI6d6wgaU=",
+        "owner": "Efe0909",
+        "repo": "teamtracker",
+        "rev": "8ce128b1d7b2ac9f124fc18184275e460d3593b2",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Efe0909",
+        "repo": "teamtracker",
         "type": "github"
       }
     }

@@ -17,9 +17,21 @@
     # Kisisel secrets `pass`te kalmaya devam eder — o insan icin, bu makine icin.
     agenix.url = "github:ryantm/agenix";
     agenix.inputs.nixpkgs.follows = "nixpkgs";
+
+    # EkipTakip uygulamasi. flake = false: o depoda flake.nix yok, sadece
+    # kaynak agaci lazim (Dockerfile + docker-compose.prod.yml).
+    #
+    # Elle `git clone /srv/...` yerine bu: surum flake.lock'ta pinli ve
+    # commit'li, yani VM sifirdan kurulsa AYNI surum gelir ve guncelleme
+    # icin VM'de shell acmak gerekmez —
+    #   nix flake update teamtracker && nixos-rebuild switch --flake .#vmtest
+    teamtracker = {
+      url = "github:Efe0909/teamtracker";
+      flake = false;
+    };
   };
 
-  outputs = { self, nixpkgs, raspberry-pi-nix, agenix, ... }: {
+  outputs = { self, nixpkgs, raspberry-pi-nix, agenix, teamtracker, ... }@inputs: {
 
     # ================================================================ GERCEK ==
     nixosConfigurations.evsunucu = nixpkgs.lib.nixosSystem {
@@ -54,6 +66,8 @@
     #     -> gercekten uygular, servisleri baslatir, boot'u test eder
     nixosConfigurations.vmtest = nixpkgs.lib.nixosSystem {
       system = "aarch64-linux";
+      # ekiptakip-app.nix `inputs.teamtracker` store yolunu okuyor.
+      specialArgs = { inherit inputs; };
       modules = [
         agenix.nixosModules.default
         ./modules/configuration.nix
