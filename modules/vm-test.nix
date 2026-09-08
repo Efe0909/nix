@@ -30,8 +30,13 @@
   evsunucu.hddVar = false;
   services.samba.enable = lib.mkForce false;      # zaten kapali, acikca da kalsin
 
-  # agenix'e secret tanimlanmadi (age.secrets bos) -> msmtp calismaz,
-  # bu BEKLENEN. Test sirasinda mail gondermeyi denemeyin.
+  # agenix'in acilista HANGI private key'e bakacagini soyluyor — bu satir
+  # olmadan varsayilan SSH host key yollarini deniyordu, onlar ssh-to-age
+  # uyumsuzlugu yuzunden calismiyordu ("no identity matched any of the
+  # recipients", ilk gercek rebuild'de yakalandi). /etc/age/vmtest.key
+  # native age-keygen ile uretildi, secrets.nix'te "vmtest" olarak
+  # tanimli. msmtp gibi diger sirlar tanimlaninca da bunu kullanacak.
+  age.identityPaths = [ "/etc/age/vmtest.key" ];
 
   # system.autoUpgrade VM'de anlamsiz — kendi kendine flake cekip
   # rebuild etmeye kalkmasin.
