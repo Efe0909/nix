@@ -30,6 +30,7 @@
         ./modules/rpi/hardware-rpi.nix
         ./modules/configuration.nix
         ./modules/cli.nix
+        ./modules/cloudflared.nix
       ];
     };
 

@@ -158,29 +158,10 @@
     # (su an sadece vmtest'e import ediliyor, bkz. flake.nix).
   };
 
-  # =========================================================== CLOUDFLARED ===
-  # Su an TASIDIGI HOSTNAME YOK — ama altyapi hazir dursun diye burada.
-  # Eski kurulumdan iki ders:
-  #   1) Unit Type=notify + TimeoutStartSec=15 idi; cloudflared READY
-  #      sinyalini vermedigi icin systemd her 20 saniyede olduruyordu
-  #      (restart sayaci 52'ye ciktı, tunel hic ayakta kalmadi).
-  #   2) Token ExecStart'ta arguman olarak duruyordu, yani `ps` ciktisinda
-  #      her kullaniciya gorunuyordu.
-  # Ikisi de burada tekrarlanmiyor.
-  #
-  # UZAKTAN degil YEREL yonetimli tunel: ingress paneldeki tiklamalarda
-  # degil bu dosyada, yani git'te. Yeni hostname eklemek = tek satir + commit.
-  #
-  # services.cloudflared = {
-  #   enable = true;
-  #   tunnels."<TUNEL-UUID>" = {
-  #     credentialsFile = config.age.secrets.cloudflared-token.path;
-  #     default = "http_status:404";
-  #     ingress = {
-  #       # "app.polonyum.com" = "http://127.0.0.1:80";
-  #     };
-  #   };
-  # };
+  # CLOUDFLARED: modules/cloudflared.nix'te — sadece evsunucu (gercek Pi)
+  # import ediyor, bkz. flake.nix. vmtest'e bilerek eklenmedi: her tunel
+  # gercek Cloudflare hesabina kayitli bir kimlik yaratiyor, atilip
+  # yeniden kurulan test VM'inden bunu yapmak anlamsiz olurdu.
 
   # ================================================================ DOCKER ===
   # Genel amacli — deploy islerinde lazim. Eski kurulumda 19 olu imaj 1GB
