@@ -29,6 +29,22 @@
   # nix.gc (configuration.nix). Ikisi ayri is.
   boot.loader.systemd-boot.configurationLimit = 10;
 
+  # --- generation temizligi: VM'e ozel ------------------------------------
+  # configuration.nix haftalik + 30 gun diyor; gercek Pi icin makul, bu VM
+  # icin degil. Burada gunde onlarca rebuild oluyor, bir haftada yuzlerce
+  # generation birikiyor.
+  #
+  # "Sil ama arsivle" diye bir orta yol YOK: generation bir symlink'tir
+  # (/nix/var/nix/profiles/system-N-link) ve ayni zamanda bir GC KOKUDUR.
+  # Symlink durdukca isaret ettigi kapanisin TAMAMI (kernel + initrd + sistem
+  # closure'i, her biri yuz MB'lar) store'da tutulur. Symlink gidince kapanis
+  # da gider. Arsivlemenin karsiligi "son N gunu tut".
+  #
+  # mkForce: configuration.nix'teki degerin uzerine yaziyor, YALNIZCA bu
+  # makinede — gercek Pi'nin politikasi degismiyor.
+  nix.gc.dates = lib.mkForce "daily";
+  nix.gc.options = lib.mkForce "--delete-older-than 7d";
+
   # Kolay giris icin — SADECE VM'de. Gercek sistemde initialPassword
   # YOK, sadece SSH anahtari var.
   users.users.efe.initialPassword = "test";
