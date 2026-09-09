@@ -19,6 +19,16 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
+  # Boot menusunde en fazla 10 girdi. Bu VM gunde onlarca kez rebuild ediliyor
+  # ve her `nixos-rebuild switch` yeni bir generation yaratiyor; sinir yokken
+  # menu 40+ satira ciktı ve ESP (boot bolumu) her kernel+initrd ciftiyle
+  # doluyordu.
+  #
+  # DIKKAT: bu yalnizca MENUYE yazilan girdi sayisini sinirlar. Eski
+  # generation'lar nix store'da durmaya devam eder — onlari silen sey
+  # nix.gc (configuration.nix). Ikisi ayri is.
+  boot.loader.systemd-boot.configurationLimit = 10;
+
   # Kolay giris icin — SADECE VM'de. Gercek sistemde initialPassword
   # YOK, sadece SSH anahtari var.
   users.users.efe.initialPassword = "test";
