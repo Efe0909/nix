@@ -304,11 +304,11 @@
     "teamtracker": {
       "flake": false,
       "locked": {
-        "lastModified": 1788901188,
-        "narHash": "sha256-SS67jyZE9HqtMgkXcDuKVwtLIQctf1FOMnvI6d6wgaU=",
+        "lastModified": 1788946976,
+        "narHash": "sha256-w0OD5EwyIX21EBsAugZK+95r4X2GuJIg03/7P2mdgjc=",
         "owner": "Efe0909",
         "repo": "teamtracker",
-        "rev": "8ce128b1d7b2ac9f124fc18184275e460d3593b2",
+        "rev": "2fc12591deeeea5e448c47d46b604567212138b6",
         "type": "github"
       },
       "original": {
