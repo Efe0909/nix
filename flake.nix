@@ -76,6 +76,7 @@
         ./modules/nginx/hello.nix
         ./modules/nginx/ekiptakip.nix
         ./modules/ekiptakip-app.nix
+        ./modules/ekiptakip-media.nix
         ./modules/cloudflared.nix
       ];
     };

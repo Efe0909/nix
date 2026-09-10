@@ -35,7 +35,13 @@ let
     proxy_set_header Connection        "";
     proxy_read_timeout 30s;
     proxy_send_timeout 30s;
-    client_max_body_size 2m;
+    # 10 MB uygulama sinirina karsi marj: dosya + multipart cercevesi, ve
+    # uygulamanin kendi erken-reddetme esiginin (~11 MB) biraz ustu — sinir
+    # asan istek nginx'ten degil UYGULAMADAN donen anlasilir hatayi alsin.
+    # Eskiden 2m'ydi: telefondan cekilen fotograf tipik 3-8 MB, yani her
+    # yukleme nginx'te CIPLAK 413 alip journalctl'de HICBIR IZ birakmadan
+    # kesiliyordu (teamtracker HANDOFF-NIX.md madde 1).
+    client_max_body_size 12m;
   '';
 
   vhost = {
