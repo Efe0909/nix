@@ -56,11 +56,11 @@ let
     #
     # set_real_ip_from PEER adresine gore calisir: yalniz baglantinin
     # KENDISI 127.0.0.1'den geliyorsa CF-Connecting-IP basligina guvenilir.
-    # LAN'dan dogrudan nginx'e vuran biri (port 80 su an tailnet disina da
-    # acik — ayri bilinen sorun) sahte bir CF-Connecting-IP gonderse bile
-    # PEER'i 127.0.0.1 olmadigi icin nginx bu basligi YOK SAYAR; $remote_addr
-    # o kisinin gercek LAN adresinde kalir. Yani bu satirlar port 80'in
-    # genisligine bagli degil, ayrica guvenli.
+    # vmtest'te port 80 varsayilan arayuzde de acik (asagida, Mac'ten
+    # 192.168.64.8 ile test icin BILEREK) — o yoldan dogrudan vuran biri
+    # sahte bir CF-Connecting-IP gonderse bile PEER'i 127.0.0.1 olmadigi
+    # icin nginx bu basligi YOK SAYAR; $remote_addr gercek adresinde kalir.
+    # Yani bu satirlar port 80'in genisligine bagli degil, ayrica guvenli.
     extraConfig = ''
       set_real_ip_from 127.0.0.1;
       real_ip_header CF-Connecting-IP;
@@ -82,10 +82,12 @@ in
   # hello.nix'te de ayni satir var — liste tipi oldugu icin catisma yok,
   # bu dosya tek basina da (hello.nix cikarilsa bile) calissin diye burada.
   #
-  # BILEREK tailnet-disina da acik birakildi (configuration.nix'in "80 SADECE
-  # tailnet uzerinden" niyetiyle CELISIYOR — bu dosya o kurali sessizce
-  # genisletiyor). Su an Tailscale bu VM'de HIC KURULU DEGIL ("Logged out"),
-  # yani bu satiri kaldirmak VM'e cloudflared disinda erisimi TAMAMEN
-  # keserdi. Once Tailscale kurulmali, sonra bu satir kaldirilmali.
+  # configuration.nix port 80'i SADECE tailscale0'a acar — bu gercek Pi'nin
+  # (evsunucu) guvenlik karari. Bu dosya (hello.nix gibi) YALNIZCA vmtest'e
+  # gider (bkz. flake.nix modul listesi), gercek Pi'yi hic etkilemez. vmtest'te
+  # varsayilan arayuzde de acmak BILEREK: Mac'ten 192.168.64.8:80 ile test
+  # edebilmek icin gerekiyor — bu VM zaten Mac'in kendi sanal agi, disariya
+  # kapali (UTM host-only/paylasimli ag), yani bu "LAN'a acik" anlaminda bir
+  # genisleme degil.
   networking.firewall.allowedTCPPorts = [ 80 ];
 }
