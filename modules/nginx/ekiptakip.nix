@@ -45,6 +45,26 @@ let
   '';
 
   vhost = {
+    # real_ip: zincir cloudflared -> nginx, cloudflared'in kendisi
+    # 127.0.0.1'den baglaniyor (ingress: http://127.0.0.1:80). Bu satirlar
+    # olmadan $remote_addr HERKES icin 127.0.0.1 olur — cunku nginx'in
+    # gordugu TEK peer cloudflared'dir, gercek ziyaretci degil. Sonuc:
+    # X-Real-IP tek bir sabit deger, giris hiz siniri (shared/hardening.py,
+    # dakikada 10) TUM siteyi TEK KOVAYA duser — biri denedikce herkes
+    # kilitlenir (teamtracker TASK-199/KNOW-86 ayni hatayi macOS conf'unda
+    # tespit etmisti; burada nix-yonetimli config hic kapsanmamisti).
+    #
+    # set_real_ip_from PEER adresine gore calisir: yalniz baglantinin
+    # KENDISI 127.0.0.1'den geliyorsa CF-Connecting-IP basligina guvenilir.
+    # LAN'dan dogrudan nginx'e vuran biri (port 80 su an tailnet disina da
+    # acik — ayri bilinen sorun) sahte bir CF-Connecting-IP gonderse bile
+    # PEER'i 127.0.0.1 olmadigi icin nginx bu basligi YOK SAYAR; $remote_addr
+    # o kisinin gercek LAN adresinde kalir. Yani bu satirlar port 80'in
+    # genisligine bagli degil, ayrica guvenli.
+    extraConfig = ''
+      set_real_ip_from 127.0.0.1;
+      real_ip_header CF-Connecting-IP;
+    '';
     locations."/" = {
       proxyPass = "http://127.0.0.1:8000";
       # Bu location hazir basliklari ALMASIN; hepsi extraConfig'te.
@@ -61,5 +81,11 @@ in
 
   # hello.nix'te de ayni satir var — liste tipi oldugu icin catisma yok,
   # bu dosya tek basina da (hello.nix cikarilsa bile) calissin diye burada.
+  #
+  # BILEREK tailnet-disina da acik birakildi (configuration.nix'in "80 SADECE
+  # tailnet uzerinden" niyetiyle CELISIYOR — bu dosya o kurali sessizce
+  # genisletiyor). Su an Tailscale bu VM'de HIC KURULU DEGIL ("Logged out"),
+  # yani bu satiri kaldirmak VM'e cloudflared disinda erisimi TAMAMEN
+  # keserdi. Once Tailscale kurulmali, sonra bu satir kaldirilmali.
   networking.firewall.allowedTCPPorts = [ 80 ];
 }
