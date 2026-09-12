@@ -1,4 +1,4 @@
-{ ... }:
+{ pkgs, ... }:
 
 # EkipTakip — medya ekleri icin ek modul (bagimsiz, hazir yapistir).
 #
@@ -50,23 +50,27 @@ in
   # karsilik gelen bir /etc/passwd kaydi yok — bind mount edilen dizinin
   # sahibi SAYISAL uid/gid ile eslesmeli, isimle degil.
   #
-  # Iki satir (tek satir degil): "d" tipi systemd-tmpfiles ust dizini
-  # OTOMATIK OLUSTURMUYOR diye guvenmek yerine ikisini de acikca yaziyoruz —
-  # ${sataKoku}/ekiptakip henuz yoksa (ilk kurulum) root:root 0755 olarak
-  # gelsin, altindaki media 10001:10001 olsun.
+  # NEDEN systemd.tmpfiles DEGIL: tmpfiles MOUNT'TAN ONCE kosabiliyor ve
+  # kostugunda dizini mount noktasinin ALTINDAKI rootfs'te (SD kart)
+  # olusturuyor; disk sonradan baglaninca o dizin golgede kaliyor ve gercek
+  # disktekinin sahipligi HIC duzelmiyor. 2026-09-12'de tam bu yasandi:
+  # `nixos-rebuild switch` sonrasi /mnt/sata/ekiptakip/media diskte root:root
+  # kalirken rootfs'te 10001:10001 bir ikizi duruyordu. tmpfiles-setup'i
+  # mount'a bagimli yapmak da cozum degil — disk yoksa (nofail) sistemin
+  # BUTUN tmpfiles kurallari duserdi.
   #
-  # BU KURALIN ISLEMESI MOUNT NOKTASININ /home DISINDA OLMASINA BAGLI.
-  # Eski /home/efe/sata yolunda systemd-tmpfiles her acilista sunu yazip
-  # kurali atliyordu (ve servis yine "basarili" gorunuyordu):
-  #   Detected unsafe path transition /home/efe (owned by efe)
-  #     -> /home/efe/sata (owned by root) during canonicalization
-  # Dolayisiyla medya dizini root:root kaldi, konteyner (uid 10001) yazamadi,
-  # her ekli mesaj 500 verdi (teamtracker issue #23). Mount'u bir daha
-  # kullanici ev dizininin altina alma.
-  systemd.tmpfiles.rules = [
-    "d ${sataKoku}/ekiptakip 0755 root root -"
-    "d ${medyaDizini} 0755 10001 10001 -"
-  ];
+  # Bunun yerine sahiplik garantisi SERVISE bagli: asagidaki
+  # RequiresMountsFor sayesinde preStart ancak disk gercekten bagliyken
+  # kosar, yani yanlis yere yazmak imkansiz. Ayrica kendi kendini onarir:
+  # dizin silinse ya da sahipligi bozulsa sonraki acilista duzelir.
+  #
+  # chown OZYINELI DEGIL: yalnizca kokun kendisi. Altindaki her sey zaten
+  # uygulama tarafindan yazildi, ve medya agaci buyudukce her acilista
+  # binlerce dosyayi gezmenin anlami yok.
+  systemd.services.ekiptakip.preStart = ''
+    ${pkgs.coreutils}/bin/mkdir -p ${medyaDizini}
+    ${pkgs.coreutils}/bin/chown 10001:10001 ${medyaDizini}
+  '';
 
   # --- servisi besle: EKIPTAKIP_MEDIA_DIR --------------------------------
   # docker-compose.prod.yml'deki satir:
