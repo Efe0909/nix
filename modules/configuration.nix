@@ -44,7 +44,19 @@
   # VM'de bu disk hic yok — nofail sayesinde VM boot'ta da sorun cikarmaz,
   # sadece mount atlanir. restic ve smartd bu diske bagli oldugu icin
   # VM'de onlar failed gorunur; bu BEKLENEN, vm-test.nix'te kapatiliyor.
-  fileSystems."/home/efe/sata" = {
+  # NEDEN /mnt/sata, /home/efe/sata DEGIL: eski yol bir KULLANICI ev dizininin
+  # altindaydi ve systemd-tmpfiles sahiplik siniri asan yollarda calismayi
+  # REDDEDIYOR (symlink saldirisi korumasi):
+  #
+  #   Detected unsafe path transition /home/efe (owned by efe)
+  #     -> /home/efe/sata (owned by root) during canonicalization
+  #
+  # Sonuc: ekiptakip-media.nix'in "d ... 10001 10001" kurali her acilista
+  # SESSIZCE atlandi, medya dizini root:root kaldi ve konteyner (uid 10001)
+  # oraya yazamadi — teamtracker issue #23, her ekli mesaj 500 aliyordu.
+  # systemd-tmpfiles-setup.service yine de "basarili" gorunuyordu; hata
+  # journal'da tek satirdi. /mnt kok'e ait, gecis guvenli, kural isliyor.
+  fileSystems."/mnt/sata" = {
     device = "/dev/disk/by-label/sata";
     fsType = "ext4";
     options = [ "noatime" "nofail" "x-systemd.device-timeout=10" ];
@@ -179,7 +191,7 @@
   services.samba = {
     enable = false;
     settings.sata = {
-      path = "/home/efe/sata";
+      path = "/mnt/sata";
       browseable = "yes";
       "read only" = "no";
       "valid users" = "efe";
@@ -199,7 +211,7 @@
   # (uzak sunucu / harici disk) eklenmeli — o ayri bir karar.
   services.restic.backups = lib.mkIf config.evsunucu.hddVar { yerel = {
     initialize = true;
-    repository = "/home/efe/sata/yedek/evsunucu";
+    repository = "/mnt/sata/yedek/evsunucu";
     passwordFile = "/run/agenix/restic-sifre";
     paths = [
       "/var/lib"        # servislerin durumu, veritabanlari
@@ -207,7 +219,8 @@
       "/etc/nixos"      # flake burada durmuyorsa da zarari yok
     ];
     exclude = [
-      "/home/efe/sata"  # kendini backup'lamasin (sonsuz dongu)
+      "/mnt/sata"       # kendini backup'lamasin; disk artik /home altinda
+                        # olmadigi icin dongu zaten imkansiz, bu kemer+askidir
       "/var/lib/docker" # imajlar yeniden cekilebilir
       "**/.cache"
     ];

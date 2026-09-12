@@ -30,12 +30,17 @@
 # kendi nginx sablonlarinda da vardi).
 
 let
-  # Kalici ev: configuration.nix'teki fileSystems."/home/efe/sata" LABEL ILE
+  # Kalici ev: configuration.nix'teki fileSystems."/mnt/sata" LABEL ILE
   # bagliyor (device = /dev/disk/by-label/sata) — gercek Pi'deki SATA disk
   # de, vmtest VM'indeki "sata" etiketli virtio disk de AYNI yola oturuyor.
   # Bu modul o path ustune tek bir alt dizin ekliyor, ikinci bir yol
   # uydurmuyor.
-  sataKoku = "/home/efe/sata";
+  #
+  # 2026-09-12'ye kadar bu yol /home/efe/sata idi ve asagidaki tmpfiles
+  # kurali HIC ISLEMEDI — gerekcesi configuration.nix'te fileSystems'in
+  # ustunde yazili (systemd-tmpfiles "unsafe path transition"). Yolu
+  # /home disina almak o hatanin duzeltmesidir; geri tasima.
+  sataKoku = "/mnt/sata";
   medyaDizini = "${sataKoku}/ekiptakip/media";
 in
 {
@@ -47,8 +52,17 @@ in
   #
   # Iki satir (tek satir degil): "d" tipi systemd-tmpfiles ust dizini
   # OTOMATIK OLUSTURMUYOR diye guvenmek yerine ikisini de acikca yaziyoruz —
-  # /home/efe/sata/ekiptakip henuz yoksa (ilk kurulum) root:root 0755 olarak
+  # ${sataKoku}/ekiptakip henuz yoksa (ilk kurulum) root:root 0755 olarak
   # gelsin, altindaki media 10001:10001 olsun.
+  #
+  # BU KURALIN ISLEMESI MOUNT NOKTASININ /home DISINDA OLMASINA BAGLI.
+  # Eski /home/efe/sata yolunda systemd-tmpfiles her acilista sunu yazip
+  # kurali atliyordu (ve servis yine "basarili" gorunuyordu):
+  #   Detected unsafe path transition /home/efe (owned by efe)
+  #     -> /home/efe/sata (owned by root) during canonicalization
+  # Dolayisiyla medya dizini root:root kaldi, konteyner (uid 10001) yazamadi,
+  # her ekli mesaj 500 verdi (teamtracker issue #23). Mount'u bir daha
+  # kullanici ev dizininin altina alma.
   systemd.tmpfiles.rules = [
     "d ${sataKoku}/ekiptakip 0755 root root -"
     "d ${medyaDizini} 0755 10001 10001 -"
@@ -83,9 +97,9 @@ in
   # acilamaz hale getiren tam da bu satirin YOKLUGUYDU, o yuzden nofail
   # BILEREK var ve KALACAK. Ama nofail'in bedeli su: disk fiziksel olarak
   # yoksa/gec taniniyorsa, systemd o mount'u sessizce ATLAR ve
-  # /home/efe/sata rootfs'te (SD kart) sIradan BOS bir dizin olarak kalir.
+  # /mnt/sata rootfs'te (SD kart) sIradan BOS bir dizin olarak kalir.
   # Yukaridaki tmpfiles kurali bu durumda da calisir ve
-  # /home/efe/sata/ekiptakip/media'yi SD KARTTA olusturur — uygulama bunu
+  # /mnt/sata/ekiptakip/media'yi SD KARTTA olusturur — uygulama bunu
   # ayirt edemez, MEDIA_ROOT yazilabilir bir dizin gorur ve mutlu mutlu
   # oraya yazmaya baslar. Sonuc: medya sessizce SD karta birikir, disk
   # takilana kadar kimse fark etmez, kart (spec: "High Endurance sinifi"
@@ -107,8 +121,8 @@ in
   # bugun configuration.nix'te de kapali (services.samba.enable = false),
   # acmak ayri bir karar ve bu modulun isi degil. Acmaya karar verirsen:
   #
-  # 1. Yalnizca MEDYA dizinini paylas, butun /home/efe/sata'yi degil —
-  #    /home/efe/sata altinda yedekler de var (services.restic.backups.yerel,
+  # 1. Yalnizca MEDYA dizinini paylas, butun /mnt/sata'yi degil —
+  #    /mnt/sata altinda yedekler de var (services.restic.backups.yerel,
   #    configuration.nix), onlari agda gezilebilir yapmanin hicbir faydasi
   #    yok, riski var.
   # 2. "read only" = "yes" SART, "no" DEGIL. Bu bytelari sahiplenen tek
@@ -121,7 +135,7 @@ in
   # services.samba = {
   #   enable = true;
   #   settings.ekiptakip-medya = {
-  #     path = "/home/efe/sata/ekiptakip/media";
+  #     path = "/mnt/sata/ekiptakip/media";
   #     browseable = "yes";
   #     "read only" = "yes";
   #     "valid users" = "efe";

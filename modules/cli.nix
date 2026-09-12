@@ -234,7 +234,7 @@ in {
     # Sistem durumu tek komutta — SSH atmak zorunda kalinan nadir anlar icin
     alias durum='systemctl --failed --no-pager; echo; \
                  systemctl is-active nginx tailscaled docker sshd; echo; \
-                 df -h / /home/efe/sata | tail -2'
+                 df -h / /mnt/sata | tail -2'
   '';
 
   # ================================================================= TMUX ====
