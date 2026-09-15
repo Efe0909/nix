@@ -248,6 +248,12 @@
   #
   # msmtp: exim4'un yerine gecer (o sadece localhost'ta mail biriktiriyordu,
   # kimse okumuyordu). Gmail uygulama parolasi agenix'te.
+  #
+  # NOT (GitGuardian "SMTP credentials" uyarisi): asagidaki blok bir sizinti
+  # DEGIL. Tarayici host + user + "password" adli bir alanda tirnakli deger
+  # gorunce tetikleniyor; oysa passwordeval bir KOMUT, parolanin kendisi
+  # degil. Parola agenix ile sifreli tutulur, git'e hicbir surumde girmedi
+  # (tum gecmis tarandi). Uyariyi false positive olarak kapat.
   programs.msmtp = {
     enable = true;
     accounts.default = {
