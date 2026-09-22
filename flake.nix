@@ -33,9 +33,9 @@
     # release'i, deploy/release.nix) ve NixOS modulunu getiriyor. Makine
     # DERLEMEZ. Guncelleme:
     #   nix flake update teamtracker-alpha02
-    # PR #35 birlesince url -> github:Efe0909/teamtracker (main).
+    # main (PR #35 birlesti).
     teamtracker-alpha02 = {
-      url = "github:Efe0909/teamtracker/rust-backend-rewrite";
+      url = "github:Efe0909/teamtracker";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };

@@ -326,16 +326,15 @@
         ]
       },
       "locked": {
-        "lastModified": 1790043546,
-        "narHash": "sha256-aZ58mGcvVt/iY1LzEd+h9BiLLscn5H/Vi/9gVShzJq4=",
+        "lastModified": 1790044471,
+        "narHash": "sha256-k623iohjV5Z4ybkYvDQDJrC3fMMJC3y78XmFOy69zrM=",
         "owner": "Efe0909",
         "repo": "teamtracker",
-        "rev": "6d92cd510ef162cd361c64fdb584d6b106d255cd",
+        "rev": "fcc32cf307b5f59bf7bd995ebd724e5cb245aa93",
         "type": "github"
       },
       "original": {
         "owner": "Efe0909",
-        "ref": "rust-backend-rewrite",
         "repo": "teamtracker",
         "type": "github"
       }
