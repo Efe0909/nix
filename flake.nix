@@ -54,6 +54,7 @@
         ./modules/vm-test.nix
         ./modules/nginx/hello.nix
         ./modules/cloudflared.nix
+        ./modules/cloudflare-dns.nix
       ] ++ extra;
     };
   in {
@@ -68,6 +69,7 @@
         ./modules/configuration.nix
         ./modules/cli.nix
         ./modules/cloudflared.nix
+        ./modules/cloudflare-dns.nix
       ];
     };
 

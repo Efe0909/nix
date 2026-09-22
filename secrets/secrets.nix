@@ -10,4 +10,7 @@ in
   # EkipTakip .env: GOOGLE_CLIENT_ID/SECRET, EKIPTAKIP_SECRET_KEY,
   # POSTGRES_PASSWORD, alan adlari. modules/ekiptakip-app.nix okuyor.
   "ekiptakip-env.age".publicKeys = [ admin vmtest ];
+  # Cloudflare API token, yalniz polonyum.com Zone:DNS:Edit.
+  # modules/cloudflare-dns.nix okuyor.
+  "cloudflare-dns-token.age".publicKeys = [ admin vmtest ];
 }
