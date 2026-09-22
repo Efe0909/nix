@@ -9,10 +9,10 @@
 #                                                             |
 #                                                        ekiptakip-db
 #
-# Kaynak agaci ELLE KLONLANMIYOR: flake input (bkz. flake.nix "teamtracker",
+# Kaynak agaci ELLE KLONLANMIYOR: flake input (bkz. flake.nix "teamtracker-alpha01",
 # flake = false). Boylece surum flake.lock'ta pinli ve commit'li — VM
 # sifirdan kurulsa ayni surum gelir, guncelleme icin VM'de shell acilmaz:
-#   nix flake update teamtracker && nixos-rebuild switch --flake .#vmtest
+#   (commit URL'de pinli; yeni 0.1 surumu = flake.nix'te commit degistir)
 #
 # Neden oci-containers degil de compose: konteyner tanimi zaten uygulamanin
 # deposunda (docker-compose.prod.yml). Nix'e ikinci kez yazmak iki kaynak
@@ -21,7 +21,7 @@
 let
   # Salt-okunur store yolu. Docker build context olarak da bu kullaniliyor;
   # build yalnizca okudugu icin sorun degil.
-  kaynak = inputs.teamtracker;
+  kaynak = inputs.teamtracker-alpha01;
 
   sir = config.age.secrets."ekiptakip-env".path;
 

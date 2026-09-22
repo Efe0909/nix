@@ -164,7 +164,8 @@
         "agenix": "agenix",
         "nixpkgs": "nixpkgs",
         "raspberry-pi-nix": "raspberry-pi-nix",
-        "teamtracker": "teamtracker"
+        "teamtracker-alpha01": "teamtracker-alpha01",
+        "teamtracker-alpha02": "teamtracker-alpha02"
       }
     },
     "rpi-bluez-firmware-src": {
@@ -301,18 +302,40 @@
         "type": "github"
       }
     },
-    "teamtracker": {
+    "teamtracker-alpha01": {
       "flake": false,
       "locked": {
-        "lastModified": 1789065294,
-        "narHash": "sha256-uIx5gJ1hlf2VHKVMTq89pSftJXDNifIBnzk0Hw5EbmI=",
+        "lastModified": 1789771388,
+        "narHash": "sha256-MHchvZcXIs8fraUUERI4OdEf3aYDCZIaV7f97C7vPMs=",
         "owner": "Efe0909",
         "repo": "teamtracker",
-        "rev": "c37807b83e8210a950fa600d466299944d7738f3",
+        "rev": "e02d71d2266ebd428db6b9746221d626fe4025d3",
         "type": "github"
       },
       "original": {
         "owner": "Efe0909",
+        "repo": "teamtracker",
+        "rev": "e02d71d2266ebd428db6b9746221d626fe4025d3",
+        "type": "github"
+      }
+    },
+    "teamtracker-alpha02": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1790043546,
+        "narHash": "sha256-aZ58mGcvVt/iY1LzEd+h9BiLLscn5H/Vi/9gVShzJq4=",
+        "owner": "Efe0909",
+        "repo": "teamtracker",
+        "rev": "6d92cd510ef162cd361c64fdb584d6b106d255cd",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Efe0909",
+        "ref": "rust-backend-rewrite",
         "repo": "teamtracker",
         "type": "github"
       }

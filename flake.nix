@@ -9,7 +9,7 @@
     # actigini dogrula; acmazsa alternatifi nixos-hardware'in
     # raspberry-pi/5 modulu.
     #
-    # vmtest hedefi bunu HIC KULLANMAZ — asagida bkz.
+    # VM hedefleri (teamtracker0.1 / teamtracker0.2) bunu HIC KULLANMAZ — asagida bkz.
     raspberry-pi-nix.url = "github:nix-community/raspberry-pi-nix";
 
     # Secrets. Makine secretsi icin: boot'ta cozulup /run/agenix altina
@@ -18,20 +18,45 @@
     agenix.url = "github:ryantm/agenix";
     agenix.inputs.nixpkgs.follows = "nixpkgs";
 
-    # EkipTakip uygulamasi. flake = false: o depoda flake.nix yok, sadece
-    # kaynak agaci lazim (Dockerfile + docker-compose.prod.yml).
+    # EkipTakip — IKI SURUM, IKI GIRDI. Her biri kendi nixosConfiguration'ina
+    # bagli; ikisi ayni VM'e ayri ayri kurulabilir (bir anda biri).
     #
-    # Elle `git clone /srv/...` yerine bu: surum flake.lock'ta pinli ve
-    # commit'li, yani VM sifirdan kurulsa AYNI surum gelir ve guncelleme
-    # icin VM'de shell acmak gerekmez —
-    #   nix flake update teamtracker && nixos-rebuild switch --flake .#vmtest
-    teamtracker = {
-      url = "github:Efe0909/teamtracker";
+    # alpha-0.1: Python + Docker compose. Kaynak agaci yeter (flake = false).
+    # Commit URL'de PINLI: `nix flake update` onu YERINDEN OYNATMAZ — bu,
+    # calistigi bilinen son 0.1 (teamtracker PR #32, Rust'tan onceki son main).
+    teamtracker-alpha01 = {
+      url = "github:Efe0909/teamtracker/e02d71d2266ebd428db6b9746221d626fe4025d3";
       flake = false;
+    };
+
+    # alpha-0.2: Rust API + React. Bir FLAKE: paketi (Mac'te derlenmis GitHub
+    # release'i, deploy/release.nix) ve NixOS modulunu getiriyor. Makine
+    # DERLEMEZ. Guncelleme:
+    #   nix flake update teamtracker-alpha02
+    # PR #35 birlesince url -> github:Efe0909/teamtracker (main).
+    teamtracker-alpha02 = {
+      url = "github:Efe0909/teamtracker/rust-backend-rewrite";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  outputs = { self, nixpkgs, raspberry-pi-nix, agenix, teamtracker, ... }@inputs: {
+  outputs = { self, nixpkgs, raspberry-pi-nix, agenix, teamtracker-alpha02, ... }@inputs:
+  let
+    # VM tabani + surume ozel moduller. specialArgs: moduller
+    # `inputs.teamtracker-alpha0X`'i okuyor.
+    vmSystem = extra: nixpkgs.lib.nixosSystem {
+      system = "aarch64-linux";
+      specialArgs = { inherit inputs; };
+      modules = [
+        agenix.nixosModules.default
+        ./modules/configuration.nix
+        ./modules/cli.nix
+        ./modules/vm-test.nix
+        ./modules/nginx/hello.nix
+        ./modules/cloudflared.nix
+      ] ++ extra;
+    };
+  in {
 
     # ================================================================ GERCEK ==
     nixosConfigurations.evsunucu = nixpkgs.lib.nixosSystem {
@@ -53,32 +78,28 @@
     # declarative olmayan bir sey var demektir.
 
     # ============================================================== VM TEST ==
-    # UTM/QEMU'da genel aarch64 VM'de test icin. raspberry-pi-nix modulu
+    # UTM/QEMU'da genel aarch64 VM (192.168.64.8). raspberry-pi-nix modulu
     # BILEREK YOK — Pi'ye ozgu device tree + bootloader, genel VM'de
     # anlamsiz/patlar. Bunun disinda evsunucu ile AYNI configuration.nix +
-    # cli.nix'i kullanir, yani nginx/firewall/docker/samba/vim/tmux/bash
-    # mantiginin TAMAMI burada gercekten test edilir.
+    # cli.nix'i kullanir.
     #
-    # VM icinde (native aarch64-linux, cross-build derdi yok):
-    #   nix build .#nixosConfigurations.vmtest.config.system.build.toplevel
-    #     -> sadece evaluate + build, hicbir seye dokunmaz
-    #   sudo nixos-rebuild switch --flake .#vmtest
-    #     -> gercekten uygular, servisleri baslatir, boot'u test eder
-    nixosConfigurations.vmtest = nixpkgs.lib.nixosSystem {
-      system = "aarch64-linux";
-      # ekiptakip-app.nix `inputs.teamtracker` store yolunu okuyor.
-      specialArgs = { inherit inputs; };
-      modules = [
-        agenix.nixosModules.default
-        ./modules/configuration.nix
-        ./modules/cli.nix
-        ./modules/vm-test.nix
-        ./modules/nginx/hello.nix
-        ./modules/nginx/ekiptakip.nix
-        ./modules/ekiptakip-app.nix
-        ./modules/ekiptakip-media.nix
-        ./modules/cloudflared.nix
-      ];
-    };
+    # Iki yapilandirma, AYNI VM, AYNI ortak taban (vmBase); fark yalniz
+    # EkipTakip surumu. Birinden digerine gecis = bir switch; geri donus ayni.
+    #   sudo nixos-rebuild switch --flake .#teamtracker0.1   # Python + Docker
+    #   sudo nixos-rebuild switch --flake .#teamtracker0.2   # Rust + React
+    # Mac'ten (VM derlemez, yalniz kopyalanir — 0.2 zaten hazir release):
+    #   nixos-rebuild switch --flake .#teamtracker0.2 \
+    #     --target-host efe@192.168.64.8 --sudo
+    nixosConfigurations."teamtracker0.1" = vmSystem [
+      ./modules/nginx/ekiptakip.nix
+      ./modules/ekiptakip-app.nix
+      ./modules/ekiptakip-media.nix
+    ];
+
+    nixosConfigurations."teamtracker0.2" = vmSystem [
+      teamtracker-alpha02.nixosModules.default
+      ./modules/nginx/ekiptakip-alpha02.nix
+      ./modules/ekiptakip-alpha02.nix
+    ];
   };
 }

@@ -65,6 +65,9 @@
         # Ikisi de AYNI nginx'e (127.0.0.1:80) gidiyor — ayrim Host
         # basligina gore nginx/uygulamanin icinde yapiliyor, cloudflared
         # sadece tasiyici. Yeni hostname eklemek: tek satir + commit.
+        # Apex: DNS kaydi da tunele gitmeli (bir kez, elle):
+        #   cloudflared tunnel route dns --overwrite-dns <TUNEL-UUID> polonyum.com
+        "polonyum.com" = "http://127.0.0.1:80";
         "app.polonyum.com" = "http://127.0.0.1:80";
         "dashboard.polonyum.com" = "http://127.0.0.1:80";
       };
