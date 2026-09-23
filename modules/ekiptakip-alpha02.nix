@@ -20,8 +20,19 @@
     group = "root";
   };
 
+  # Ilk yonetici listesi (teamtracker KNOW-320): satir basina bir e-posta, her
+  # acilista aktif admin. Servis kullanicisi 0400 root dosyayi okuyamaz; modul
+  # onu systemd LoadCredential ile verir.
+  age.secrets."ekiptakip-bootstrap-admins" = {
+    file = ../secrets/ekiptakip-bootstrap-admins.age;
+    mode = "0400";
+    owner = "root";
+    group = "root";
+  };
+
   services.ekiptakip = {
     enable = true;
+    bootstrapAdminsFile = config.age.secrets."ekiptakip-bootstrap-admins".path;
     # Mac'te derlenmis release (teamtracker backend/tools/release.sh). Bu
     # makine DERLEMEZ.
     package = inputs.teamtracker-alpha02.packages.aarch64-linux.default;
