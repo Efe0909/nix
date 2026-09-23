@@ -7,7 +7,7 @@
 # acilmasi. nginx: modules/nginx/ekiptakip.nix (statik + /api vekili).
 #
 # ekiptakip-app.nix (docker compose) ve ekiptakip-media.nix (uid 10001 chown)
-# artik ice aktarilmiyor; geri donus icin dosyalar duruyor.
+# yalniz teamtracker0.1'e ait; bu hedef onlari almaz.
 {
   # Icerigi: GOOGLE_CLIENT_ID/SECRET, EKIPTAKIP_SECRET_KEY, alan adlari,
   # cerez alan adi. Eski compose'tan kalan POSTGRES_PASSWORD/APP_PORT

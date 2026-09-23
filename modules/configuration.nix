@@ -143,18 +143,14 @@
   # ================================================================ SECRETS ==
   # agenix: secrets repoda ENCRYPTED durur, boot'ta /run/agenix altina cozulur.
   # secrets.nix icinde hangi anahtarin hangi secret'i acabilecegi yazar.
-  age.secrets = {
-    # Yollar ../secrets/... olacak — bu dosya modules/ altinda, secrets/ kokte.
-    # Su an secrets/ dizini yok (denenip kaldirildi — ssh-to-age uyumsuzlugu
-    # nedeniyle native age-keygen ile yeniden kurulacak, ayri bir is).
-    # cloudflared-token.file = ../secrets/cloudflared-token.age;
-    # wifi-psk.file          = ../secrets/wifi-psk.age;
-    # smtp-sifre = { file = ../secrets/smtp.age; owner = "efe"; };
-  };
+  # Sir, onu kullanan modulde tanimlanir (cloudflared.nix, cloudflare-dns.nix,
+  # ekiptakip-alpha02.nix); anahtarlar secrets/secrets.nix'te.
+  # EKSIK: asagidaki restic `restic-sifre` ve msmtp `smtp-sifre` hic
+  # tanimlanmadi — Pi'de yedek ve ariza maili bu iki .age gelene kadar calismaz.
 
   # ================================================================= NGINX ===
-  # Simdilik dis dunyaya bir sey servis etmiyor; EkipTakip gelince burasi
-  # dolacak. Iskeleti simdiden dogru kurmak, o gun tek satir eklemek demek.
+  # Yalniz catch-all 404. Gercek vhost'lar modules/nginx/ altinda, hedefe
+  # gore flake.nix'te eklenir.
   services.nginx = {
     enable = true;
     recommendedProxySettings = true;
@@ -166,14 +162,9 @@
       locations."/".return = "404";
     };
 
-    # Yeni bir proje icin vhost eklerken sablon: modules/nginx/hello.nix
-    # (su an sadece vmtest'e import ediliyor, bkz. flake.nix).
   };
 
-  # CLOUDFLARED: modules/cloudflared.nix'te — sadece evsunucu (gercek Pi)
-  # import ediyor, bkz. flake.nix. vmtest'e bilerek eklenmedi: her tunel
-  # gercek Cloudflare hesabina kayitli bir kimlik yaratiyor, atilip
-  # yeniden kurulan test VM'inden bunu yapmak anlamsiz olurdu.
+  # CLOUDFLARED: modules/cloudflared.nix (evsunucu ve VM ikisi de alir).
 
   # ================================================================ DOCKER ===
   # Genel amacli — deploy islerinde lazim. Eski kurulumda 19 olu imaj 1GB
@@ -290,8 +281,7 @@
   systemd.services.nginx.onFailure      = [ "notification@nginx.service" ];
   systemd.services.tailscaled.onFailure = [ "notification@tailscaled.service" ];
   systemd.services.logrotate.onFailure  = [ "notification@logrotate.service" ];
-  # cloudflared etkinlestirildiginde bu satiri da ac:
-  # systemd.services.cloudflared.onFailure = [ "notification@cloudflared.service" ];
+  # cloudflared'inki cloudflared.nix'te.
 
   # ================================================================ JOURNAL ==
   # Eski kurulumda 783MB'a cikmisti. Disk asinmasi ve yer icin sinirli.

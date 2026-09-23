@@ -79,11 +79,8 @@ in
     "dashboard.polonyum.com" = vhost;   # MASAUSTU
   };
 
-  # hello.nix'te de ayni satir var — liste tipi oldugu icin catisma yok,
-  # bu dosya tek basina da (hello.nix cikarilsa bile) calissin diye burada.
-  #
   # configuration.nix port 80'i SADECE tailscale0'a acar — bu gercek Pi'nin
-  # (evsunucu) guvenlik karari. Bu dosya (hello.nix gibi) YALNIZCA vmtest'e
+  # (evsunucu) guvenlik karari. Bu dosya YALNIZCA vmtest'e
   # gider (bkz. flake.nix modul listesi), gercek Pi'yi hic etkilemez. vmtest'te
   # varsayilan arayuzde de acmak BILEREK: Mac'ten 192.168.64.8:80 ile test
   # edebilmek icin gerekiyor — bu VM zaten Mac'in kendi sanal agi, disariya

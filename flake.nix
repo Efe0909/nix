@@ -32,8 +32,7 @@
     # alpha-0.2: Rust API + React. Bir FLAKE: paketi (Mac'te derlenmis GitHub
     # release'i, deploy/release.nix) ve NixOS modulunu getiriyor. Makine
     # DERLEMEZ. Guncelleme:
-    #   nix flake update teamtracker-alpha02
-    # main (PR #35 birlesti).
+    #   nix flake update teamtracker-alpha02   # main'in guncel pini
     teamtracker-alpha02 = {
       url = "github:Efe0909/teamtracker";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -52,7 +51,6 @@
         ./modules/configuration.nix
         ./modules/cli.nix
         ./modules/vm-test.nix
-        ./modules/nginx/hello.nix
         ./modules/cloudflared.nix
         ./modules/cloudflare-dns.nix
       ] ++ extra;

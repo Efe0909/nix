@@ -44,9 +44,7 @@
 #          -o secrets/cloudflared-creds.age ~/.cloudflared/<UUID>.json
 #   4. secrets/secrets.nix'e "cloudflared-creds.age".publicKeys = [ ... ];
 #   5. age.secrets.cloudflared-creds.file = ../secrets/cloudflared-creds.age;
-#      asagida zaten var, sadece secrets/ dizinini yeniden kurman lazim
-#      (bugun secrets/ tamamen kaldirildi, native age-keygen ile bastan
-#      kurulacak).
+#      (asagida).
 
 {
   age.secrets.cloudflared-creds = {
