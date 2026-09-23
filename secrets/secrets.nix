@@ -16,4 +16,8 @@ in
   # Cloudflare API token, yalniz polonyum.com Zone:DNS:Edit.
   # modules/cloudflare-dns.nix okuyor.
   "cloudflare-dns-token.age".publicKeys = [ admin adminSsh vmtest ];
+  # EkipTakip ilk yonetici listesi (teamtracker KNOW-320): satir basina bir
+  # e-posta, her acilista aktif admin yapilir. modules/ekiptakip-alpha02.nix
+  # okuyacak — teamtracker pini `bootstrapAdminsFile` secenegini tasiyinca.
+  "ekiptakip-bootstrap-admins.age".publicKeys = [ admin adminSsh vmtest ];
 }
