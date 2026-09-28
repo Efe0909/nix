@@ -103,6 +103,19 @@ let
         add_header Cache-Control "no-store" always;
       '';
     };
+
+    # Ek baytlari ve kucuk resimler: Cache-Control'u Rust koyar (GET'te
+    # "private, max-age=31536000, immutable" — ek icerigi degismez, silinen
+    # ek 404 doner). /api/'nin no-store'u burada OLMAMALI, yoksa her gorsel
+    # her acilista yeniden iner. Yukleme (POST) ve etiket/silme de buradan
+    # gecer; onlar zaten onbelleklenmez.
+    locations."/api/attachments/" = {
+      proxyPass = "http://127.0.0.1:${toString config.services.ekiptakip.port}";
+      recommendedProxySettings = false;
+      extraConfig = proxyBasliklari + ''
+        add_header X-Content-Type-Options nosniff always;
+      '';
+    };
   };
 in
 {
