@@ -109,7 +109,12 @@ let
     # ek 404 doner). /api/'nin no-store'u burada OLMAMALI, yoksa her gorsel
     # her acilista yeniden iner. Yukleme (POST) ve etiket/silme de buradan
     # gecer; onlar zaten onbelleklenmez.
-    locations."/api/attachments/" = {
+    #
+    # Onek SONDA "/" OLMADAN: "/"yle biten onek + proxy_pass'te nginx,
+    # egik cizgisiz istegi (yukleme: POST /api/attachments?name=) 301 ile
+    # "/api/attachments/"a yonlendirir — hem de http:// (TLS cloudflared'de
+    # bitiyor), tarayici mixed content diye bloklar, yukleme olmaz.
+    locations."/api/attachments" = {
       proxyPass = "http://127.0.0.1:${toString config.services.ekiptakip.port}";
       recommendedProxySettings = false;
       extraConfig = proxyBasliklari + ''
