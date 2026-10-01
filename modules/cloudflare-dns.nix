@@ -67,7 +67,11 @@ in
 
           ensure() {
             local host=$1 target=$2 recs
-            recs=$(api "$API/zones/$Z/dns_records?name=$host&per_page=100")
+            # Yalniz adresleme kayitlari: ayni isimdeki TXT/MX'e dokunma. Apex'te
+            # Google Search Console dogrulama TXT'si (google-site-verification=)
+            # yasar; eskiden her switch'te CNAME'le birlikte siliniyordu.
+            recs=$(api "$API/zones/$Z/dns_records?name=$host&per_page=100" \
+              | jq '.result |= map(select(.type == "A" or .type == "AAAA" or .type == "CNAME"))')
             if jq -e --arg t "$target" \
                  '.result | length == 1 and .[0].type == "CNAME" and .[0].content == $t and .[0].proxied' \
                  <<<"$recs" >/dev/null; then
