@@ -67,6 +67,8 @@
         "polonyum.com" = "http://127.0.0.1:80";
         "app.polonyum.com" = "http://127.0.0.1:80";
         "dashboard.polonyum.com" = "http://127.0.0.1:80";
+        # nginx'te apex'e 301 (modules/nginx/ekiptakip-alpha02.nix).
+        "www.polonyum.com" = "http://127.0.0.1:80";
       };
     };
   };

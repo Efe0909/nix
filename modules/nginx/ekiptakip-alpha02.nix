@@ -122,12 +122,33 @@ let
       '';
     };
   };
+
+  # Apex'in JS'siz statik sayfalari (frontend/home|privacy|terms.html). Google
+  # OAuth marka dogrulamasi ham HTML okur: SPA kabugu bos <div id="root">
+  # gosteriyordu -> "ana sayfa giris arkasinda / amaci anlatmiyor / gizlilik
+  # politikasi yetersiz". Yalniz apex'te; app./dashboard. kokleri SPA kalir.
+  statik = page: {
+    tryFiles = "/${page}.html =404";
+    extraConfig = guvenlikBasliklari + ''
+      add_header Cache-Control "no-cache" always;
+    '';
+  };
+  apex = vhost // {
+    locations = vhost.locations // {
+      "= /" = statik "home";
+      "= /privacy" = statik "privacy";
+      "= /terms" = statik "terms";
+    };
+  };
 in
 {
   services.nginx.virtualHosts = {
-    "polonyum.com" = vhost;             # KARSILAMA + giris
+    "polonyum.com" = apex;              # KARSILAMA (statik ana sayfa) + giris
     "app.polonyum.com" = vhost;         # MOBIL yuz
     "dashboard.polonyum.com" = vhost;   # MASAUSTU yuz
+    # www yalniz apex'e yonlenir (Cloudflare onerisi: www'ye ulasilamiyordu).
+    # https SABIT: TLS cloudflared'de biter, $scheme burada http.
+    "www.polonyum.com".locations."/".return = "301 https://polonyum.com$request_uri";
   };
 
   # configuration.nix port 80'i SADECE tailscale0'a acar — bu gercek Pi'nin
