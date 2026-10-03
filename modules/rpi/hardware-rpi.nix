@@ -17,6 +17,11 @@
     value = "off";
   };
 
+  # agenix bu native age anahtariyla cozer (ssh host key degil — ssh-to-age
+  # uyumsuz, bkz. vm-test.nix). Kurulumda /mnt/etc/age/evsunucu.key olarak
+  # konur; kaybolursa secrets/ `admin` anahtariyla yeniden sifrelenir.
+  age.identityPaths = [ "/etc/age/evsunucu.key" ];
+
   # HDD'nin sonuna acilan iki bolum, ETIKETLE eslesir (USB disk adlari
   # sda/sdb kayabilir, etiket kaymaz). Veri bolumu `sata` configuration.nix'te.
   fileSystems."/" = {

@@ -7,19 +7,22 @@ let
   # age.identityPaths (vm-test.nix) buraya isaret ediyor. ssh-to-age
   # DEGIL — o uyumsuz cikmisti, native age-keygen kullanildi.
   vmtest = "age16v3n5ap0v0d3a5pjhdsk9ajfrkhskqug0j04wt4qr2t7lqr8ggwsxrwu5l";
+  # Gercek Pi (evsunucu): /etc/age/evsunucu.key (hardware-rpi.nix
+  # age.identityPaths). Native age-keygen, kurulumda NIXROOT'a konuldu.
+  evsunucu = "age1702cl4sgv37twayvmr4vjzlh9mev066jt50kdpt30tjtqmwp9asscgwart";
 in
 {
-  "cloudflared-creds.age".publicKeys = [ admin adminSsh vmtest ];
+  "cloudflared-creds.age".publicKeys = [ admin adminSsh vmtest evsunucu ];
   # EkipTakip .env: GOOGLE_CLIENT_ID/SECRET, EKIPTAKIP_SECRET_KEY,
   # POSTGRES_PASSWORD, alan adlari. modules/ekiptakip-app.nix okuyor.
   "ekiptakip-env.age".publicKeys = [ admin adminSsh vmtest ];
   # Cloudflare API token, yalniz polonyum.com Zone:DNS:Edit.
   # modules/cloudflare-dns.nix okuyor.
-  "cloudflare-dns-token.age".publicKeys = [ admin adminSsh vmtest ];
+  "cloudflare-dns-token.age".publicKeys = [ admin adminSsh vmtest evsunucu ];
+  # eduroam parolasi (NetworkManager ortam dosyasi). modules/rpi/wifi.nix okuyor.
+  "eduroam-env.age".publicKeys = [ admin adminSsh evsunucu ];
   # EkipTakip ilk yonetici listesi (teamtracker KNOW-320): satir basina bir
   # e-posta, her acilista aktif admin yapilir. modules/ekiptakip-alpha02.nix
   # okuyacak — teamtracker pini `bootstrapAdminsFile` secenegini tasiyinca.
-  # eduroam parolasi (NetworkManager ortam dosyasi). modules/rpi/wifi.nix okuyor.
-  "eduroam-env.age".publicKeys = [ admin adminSsh ];
   "ekiptakip-bootstrap-admins.age".publicKeys = [ admin adminSsh vmtest ];
 }
