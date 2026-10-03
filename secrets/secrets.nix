@@ -19,5 +19,7 @@ in
   # EkipTakip ilk yonetici listesi (teamtracker KNOW-320): satir basina bir
   # e-posta, her acilista aktif admin yapilir. modules/ekiptakip-alpha02.nix
   # okuyacak — teamtracker pini `bootstrapAdminsFile` secenegini tasiyinca.
+  # eduroam parolasi (NetworkManager ortam dosyasi). modules/rpi/wifi.nix okuyor.
+  "eduroam-env.age".publicKeys = [ admin adminSsh ];
   "ekiptakip-bootstrap-admins.age".publicKeys = [ admin adminSsh vmtest ];
 }

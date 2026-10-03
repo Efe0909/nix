@@ -1,7 +1,7 @@
-{ config, pkgs, lib, ... }:
+{ config, options, pkgs, lib, ... }:
 
 # Pi hedefinde de vmtest hedefinde de ORTAK olan config. Donanima ozgu
-# tek satir (raspberry-pi-nix.board) hardware-rpi.nix'te, sadece gercek
+# ayarlar hardware-rpi.nix'te, sadece gercek
 # Pi hedefi onu import ediyor — bu dosya QEMU/UTM'de de sorunsuz build olsun.
 
 {
@@ -287,10 +287,14 @@
   # Eski kurulumda 783MB'a cikmisti. Disk asinmasi ve yer icin sinirli.
   # extraConfig eski API'ydi, bu nixpkgs snapshot'inda kaldirilmis
   # (vmtest'te "no longer has any effect" assertion'i ile yakalandi).
-  services.journald.settings.Journal = {
-    SystemMaxUse = "200M";
-    SystemMaxFileSize = "20M";
-  };
+  # Iki nixpkgs kullaniliyor: VM'ler unstable (`settings`), evsunucu
+  # nixos-raspberrypi'nin 26.05'i (henuz yalniz `extraConfig`). Ikisi de
+  # ayni sonucu verir; secenegin varligina gore secilir.
+  services.journald =
+    let limits = { SystemMaxUse = "200M"; SystemMaxFileSize = "20M"; };
+    in if options.services.journald ? settings
+       then { settings.Journal = limits; }
+       else { extraConfig = lib.generators.toKeyValue { } limits; };
 
   # ======================================================== OTOMATIK BAKIM ===
   system.autoUpgrade = {

@@ -4,13 +4,16 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
-    # Pi 5 vendor kernel + firmware. Kurulumun EN KIRILGAN parcasi: Pi 4
-    # oturmus, Pi 5 daha yeni. Kurulumdan ONCE bunun o gunku surumunun
-    # actigini dogrula; acmazsa alternatifi nixos-hardware'in
-    # raspberry-pi/5 modulu.
+    # Pi 5 vendor kernel + firmware + bootloader (kernelboot). Eski
+    # nix-community/raspberry-pi-nix BIRAKILDI: pini Mart 2025'te kalmisti,
+    # guncel nixpkgs'ta `attribute 'buildDTBs' missing` ile degerlendirme
+    # bile olmuyordu. Bu girdi bakimli ve binary cache'i var
+    # (nixos-raspberrypi.cachix.org) — Pi'de kernel DERLENMEZ.
     #
-    # VM hedefleri (teamtracker0.1 / teamtracker0.2) bunu HIC KULLANMAZ — asagida bkz.
-    raspberry-pi-nix.url = "github:nix-community/raspberry-pi-nix";
+    # DIKKAT: kendi nixpkgs'ini (nixos-26.05) getiriyor; evsunucu ONUNLA
+    # kurulur (cache isabeti icin `follows` YOK). VM hedefleri kendi
+    # nixpkgs'inde (unstable) kalir ve bunu HIC KULLANMAZ.
+    nixos-raspberrypi.url = "github:nvmd/nixos-raspberrypi/main";
 
     # Secrets. Makine secretsi icin: boot'ta cozulup /run/agenix altina
     # yazilir, servis oradan okur, klavyeye kimse dokunmaz.
@@ -39,7 +42,15 @@
     };
   };
 
-  outputs = { self, nixpkgs, raspberry-pi-nix, agenix, teamtracker-alpha02, ... }@inputs:
+  # Cache'siz kernel derlemesine dusmemek icin ZORUNLU: yoksa saatler surer.
+  nixConfig = {
+    extra-substituters = [ "https://nixos-raspberrypi.cachix.org" ];
+    extra-trusted-public-keys = [
+      "nixos-raspberrypi.cachix.org-1:4iMO9LXa8BqhU+Rpg6LQKiGa2lsNh/j2oiYLNOQ5sPI="
+    ];
+  };
+
+  outputs = { self, nixpkgs, nixos-raspberrypi, agenix, teamtracker-alpha02, ... }@inputs:
   let
     # VM tabani + surume ozel moduller. specialArgs: moduller
     # `inputs.teamtracker-alpha0X`'i okuyor.
@@ -58,12 +69,13 @@
   in {
 
     # ================================================================ GERCEK ==
-    nixosConfigurations.evsunucu = nixpkgs.lib.nixosSystem {
-      system = "aarch64-linux";
+    nixosConfigurations.evsunucu = nixos-raspberrypi.lib.nixosSystem {
+      specialArgs = { inherit inputs nixos-raspberrypi; };
       modules = [
-        raspberry-pi-nix.nixosModules.raspberry-pi
+        nixos-raspberrypi.nixosModules.raspberry-pi-5.base
         agenix.nixosModules.default
         ./modules/rpi/hardware-rpi.nix
+        ./modules/rpi/wifi.nix
         ./modules/configuration.nix
         ./modules/cli.nix
         ./modules/cloudflared.nix
