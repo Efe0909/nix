@@ -17,6 +17,12 @@
     value = "off";
   };
 
+  # Pi 5'te USB portlari RP1 cipinde ve surucusu bu kernel'de MODUL
+  # (drivers/misc/rp1/rp1-pci); xhci/uas/usb-storage built-in. Initrd'de
+  # rp1-pci yoksa USB disk hic gorunmez ve acilis "busybox"a duser —
+  # ilk kurulumda tam bu yuzden dustu. kernelModules: stage-1'de ZORLA yukle.
+  boot.initrd.kernelModules = [ "rp1-pci" ];
+
   # agenix bu native age anahtariyla cozer (ssh host key degil — ssh-to-age
   # uyumsuz, bkz. vm-test.nix). Kurulumda /mnt/etc/age/evsunucu.key olarak
   # konur; kaybolursa secrets/ `admin` anahtariyla yeniden sifrelenir.
