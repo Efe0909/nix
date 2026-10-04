@@ -62,8 +62,10 @@
         ./modules/configuration.nix
         ./modules/cli.nix
         ./modules/vm-test.nix
-        ./modules/cloudflared.nix
-        ./modules/cloudflare-dns.nix
+        # cloudflared + cloudflare-dns BILEREK YOK: tunel (45170328-…) artik
+        # yalniz evsunucu'da. Ayni kimligi iki makine kullaninca trafik
+        # ikisine dagiliyordu. VM'i yeniden internete acmak gerekirse yeni
+        # bir tunel (cloudflared tunnel create) + ayri credentials sirri ac.
       ] ++ extra;
     };
   in {
@@ -80,6 +82,10 @@
         ./modules/cli.nix
         ./modules/cloudflared.nix
         ./modules/cloudflare-dns.nix
+        # EkipTakip 0.2 (Rust + React + yerel PostgreSQL, temiz veritabani).
+        teamtracker-alpha02.nixosModules.default
+        ./modules/nginx/ekiptakip-alpha02.nix
+        ./modules/ekiptakip-alpha02.nix
       ];
     };
 

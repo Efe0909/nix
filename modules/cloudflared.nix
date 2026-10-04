@@ -73,5 +73,9 @@
     };
   };
 
-  systemd.services.cloudflared.onFailure = [ "notification@cloudflared.service" ];
+  # Birimin gercek adi cloudflared-tunnel-<uuid>. Eskiden `cloudflared`
+  # yaziyordu: o adda birim yok, bos bir unit yaratiliyordu ("no ExecStart"
+  # uyarisi) ve bildirim hic tetiklenmiyordu.
+  systemd.services."cloudflared-tunnel-45170328-7abe-4869-b12d-2d85cff85c30".onFailure =
+    [ "notification@cloudflared-tunnel-45170328-7abe-4869-b12d-2d85cff85c30.service" ];
 }

@@ -12,17 +12,19 @@ let
   evsunucu = "age1702cl4sgv37twayvmr4vjzlh9mev066jt50kdpt30tjtqmwp9asscgwart";
 in
 {
-  "cloudflared-creds.age".publicKeys = [ admin adminSsh vmtest evsunucu ];
+  # Tunel artik yalniz evsunucu'da: vmtest alicilardan CIKARILDI (rekey ile
+  # VM'in bu sirlari cozme yetkisi de gider).
+  "cloudflared-creds.age".publicKeys = [ admin adminSsh evsunucu ];
   # EkipTakip .env: GOOGLE_CLIENT_ID/SECRET, EKIPTAKIP_SECRET_KEY,
-  # POSTGRES_PASSWORD, alan adlari. modules/ekiptakip-app.nix okuyor.
-  "ekiptakip-env.age".publicKeys = [ admin adminSsh vmtest ];
+  # alan adlari. modules/ekiptakip-alpha02.nix okuyor.
+  "ekiptakip-env.age".publicKeys = [ admin adminSsh vmtest evsunucu ];
   # Cloudflare API token, yalniz polonyum.com Zone:DNS:Edit.
   # modules/cloudflare-dns.nix okuyor.
-  "cloudflare-dns-token.age".publicKeys = [ admin adminSsh vmtest evsunucu ];
+  "cloudflare-dns-token.age".publicKeys = [ admin adminSsh evsunucu ];
   # eduroam parolasi (NetworkManager ortam dosyasi). modules/rpi/wifi.nix okuyor.
   "eduroam-env.age".publicKeys = [ admin adminSsh evsunucu ];
   # EkipTakip ilk yonetici listesi (teamtracker KNOW-320): satir basina bir
   # e-posta, her acilista aktif admin yapilir. modules/ekiptakip-alpha02.nix
   # okuyacak — teamtracker pini `bootstrapAdminsFile` secenegini tasiyinca.
-  "ekiptakip-bootstrap-admins.age".publicKeys = [ admin adminSsh vmtest ];
+  "ekiptakip-bootstrap-admins.age".publicKeys = [ admin adminSsh vmtest evsunucu ];
 }

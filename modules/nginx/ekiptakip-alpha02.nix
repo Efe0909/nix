@@ -151,12 +151,8 @@ in
     "www.polonyum.com".locations."/".return = "301 https://polonyum.com$request_uri";
   };
 
-  # configuration.nix port 80'i SADECE tailscale0'a acar — bu gercek Pi'nin
-  # (evsunucu) guvenlik karari. Bu dosya YALNIZCA vmtest'e
-  # gider (bkz. flake.nix modul listesi), gercek Pi'yi hic etkilemez. vmtest'te
-  # varsayilan arayuzde de acmak BILEREK: Mac'ten 192.168.64.8:80 ile test
-  # edebilmek icin gerekiyor — bu VM zaten Mac'in kendi sanal agi, disariya
-  # kapali (UTM host-only/paylasimli ag), yani bu "LAN'a acik" anlaminda bir
-  # genisleme degil.
-  networking.firewall.allowedTCPPorts = [ 80 ];
+  # Firewall'a DOKUNMUYOR. Bu dosya hem vmtest hem evsunucu'da: Pi'de port 80
+  # yalniz tailscale0'a acik (configuration.nix, guvenlik karari — yurt/LAN'a
+  # kapali, disariya yalniz cloudflared 127.0.0.1:80'e baglanarak gelir).
+  # VM'in Mac'ten test icin 80'i tum arayuzlere acmasi vm-test.nix'te.
 }

@@ -64,6 +64,11 @@
   # tanimli. msmtp gibi diger sirlar tanimlaninca da bunu kullanacak.
   age.identityPaths = [ "/etc/age/vmtest.key" ];
 
+  # Mac'ten 192.168.64.8:80 ile test icin 80 tum arayuzlere acik. Bu VM
+  # Mac'in kendi sanal agi (UTM paylasimli ag), disariya kapali; gercek Pi'de
+  # bu yok (configuration.nix: 80 yalniz tailscale0).
+  networking.firewall.allowedTCPPorts = [ 80 ];
+
   # system.autoUpgrade VM'de anlamsiz — kendi kendine flake cekip
   # rebuild etmeye kalkmasin.
   system.autoUpgrade.enable = lib.mkForce false;
