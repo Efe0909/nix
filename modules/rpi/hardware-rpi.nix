@@ -40,4 +40,10 @@
     fsType = "vfat";
     options = [ "noatime" "umask=0077" ];
   };
+
+  # GECICI KURTARMA PAROLASI (konsol girisi). Ilk kurulumda efe'nin sifresi
+  # yoktu ve ag gelmeyince iceri girilemedi. SSH hala yalniz anahtar
+  # (PasswordAuthentication kapali). Sonraki surumde SIL — parola chat'e
+  # yazildi, yani yanmis kabul et.
+  users.users.efe.hashedPassword = "$6$iQk/yMxsN1LHhLfj$y8fxhXW3h2np7cxkZD2NnTNUno0S2fkzvgtH3NmUyZvc/y784a8qTeNNHRWmqYjs4v2PaoP4BTz9GdihVKBoC0";
 }

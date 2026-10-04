@@ -16,7 +16,8 @@
     connection = {
       id = "eduroam";
       type = "wifi";
-      interface-name = "wlan0";
+      # interface-name YOK: NixOS arayuzu wlan0 degil "wld0" adlandiriyor
+      # (ilk bootta profil bu yuzden eslesmedi, wifi hic denenmedi).
       autoconnect-priority = "10";   # kablo (100) onde, wifi yedek
     };
     wifi = { mode = "infrastructure"; ssid = "eduroam"; };
