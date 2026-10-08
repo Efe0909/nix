@@ -225,11 +225,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1791446668,
-        "narHash": "sha256-4mhrwxavY6fn0L0wIwcx66HvNIqbiCCDJVgUmw3Rawc=",
+        "lastModified": 1791468655,
+        "narHash": "sha256-NUOGBQR0EPKOGH7gJQpxaJAFCrW2ybW13eySGCXlWDI=",
         "owner": "Efe0909",
         "repo": "teamtracker",
-        "rev": "071a3dba685b296c25e37b75d9df01995e664452",
+        "rev": "88e5b5452bddef2bf9884486b3d1de781660f375",
         "type": "github"
       },
       "original": {
