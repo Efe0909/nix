@@ -28,12 +28,15 @@ let
   # Ustune yazmak yetmiyor: nginx'te proxy_set_header ayni seviyede iki kez
   # tanimlanirsa baslik CIFT gider, hangisinin kazandigi belirsizdir. Bu
   # yuzden hazir seti hic dahil etmiyor, hepsini burada acikca yaziyoruz.
-  proxyBasliklari = ''
+  kimlikBasliklari = ''
     proxy_set_header Host              $host;    # iki alan adi ayrimi buna bagli
     proxy_set_header X-Real-IP         $remote_addr;
     proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
     proxy_set_header X-Forwarded-Proto https;    # SABIT — yukaridaki nota bak
     proxy_http_version 1.1;
+  '';
+
+  proxyBasliklari = kimlikBasliklari + ''
     proxy_set_header Connection        "";
     proxy_read_timeout 30s;
     proxy_send_timeout 30s;
@@ -46,14 +49,32 @@ let
     client_max_body_size 12m;
   '';
 
+  # --- WebSocket (/api/ws; teamtracker backend/src/realtime.rs, spec/77) ---
+  # /api/'nin `Connection ""` ve 30 sn okuma zaman asimi bir yukseltmeyi
+  # oldurur. Kimlik basliklari ortak (ayni baslik IKI KEZ tanimlanmaz, yukaridaki
+  # not), Upgrade/Connection ve uzun zaman asimi buraya ozel.
+  #
+  # Host $host KALMALI: uygulama Origin == Host denetler (tarayici disi
+  # istekler Origin'siz gecer, yabanci Origin 403). Sunucu 25 sn'de bir ping
+  # atar; 3600s yalniz bosta kalan baglantilarin nginx'te kesilmemesi icin.
+  # Cloudflare tuneli WebSocket'i ayrica ayar istemez.
+  wsBasliklari = kimlikBasliklari + ''
+    proxy_set_header Upgrade           $http_upgrade;
+    proxy_set_header Connection        "upgrade";
+    proxy_read_timeout 3600s;
+    proxy_send_timeout 3600s;
+  '';
+
   # Statik yanitlarin basliklari. add_header KALITIMI TUZAGI: bir location'da
   # tek bir add_header bile server seviyesindekileri SILER — o yuzden her
   # location bunu KENDISI ekliyor, server seviyesinde hic add_header yok.
   #
   # CSP: Vite derlemesi satir ici betik/stil uretmiyor, dis kaynak yok.
   # Google girisi bir YONLENDIRME (form degil), form-action'a girmiyor.
+  # connect-src: 'self' ayni kaynaga ws/wss'yi de kapsar (CSP3) ama eski Safari
+  # kapsamiyordu ve app. yuzu telefondan acilir; wss://$host acikca yazilir.
   guvenlikBasliklari = ''
-    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'" always;
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' wss://$host; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'" always;
     add_header X-Content-Type-Options nosniff always;
     add_header X-Frame-Options DENY always;
     add_header Referrer-Policy strict-origin-when-cross-origin always;
@@ -102,6 +123,13 @@ let
         add_header X-Content-Type-Options nosniff always;
         add_header Cache-Control "no-store" always;
       '';
+    };
+
+    # Gercek zamanli kanal. "=" tam eslesme: /api/'ye gore her zaman kazanir.
+    locations."= /api/ws" = {
+      proxyPass = "http://127.0.0.1:${toString config.services.ekiptakip.port}";
+      recommendedProxySettings = false;
+      extraConfig = wsBasliklari;
     };
 
     # Ek baytlari ve kucuk resimler: Cache-Control'u Rust koyar (GET'te
